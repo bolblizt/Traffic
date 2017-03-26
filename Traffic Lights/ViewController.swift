@@ -21,12 +21,9 @@ class ViewController: UIViewController, SwitchingLightDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        self.title = "Traffic"
-        DispatchQueue.global(qos: .default).async {
-            self.trafficSwitch = SwitchingLight()
-            self.trafficSwitch.delegate = self
-        }
+        
+        
+       self.setupTraffic()
         
     }
 
@@ -35,7 +32,16 @@ class ViewController: UIViewController, SwitchingLightDelegate {
         // Dispose of any resources that can be recreated.
     }
 
+    func setupTraffic(){
+        self.title = "Traffic"
+        DispatchQueue.global(qos: .default).async {
+            self.trafficSwitch = SwitchingLight()
+            self.trafficSwitch.delegate = self
+        }
+    }
 
+    
+    //Start and stop button method
     @IBAction func StartTraffic(){
         
         if !self.buttonState{
@@ -44,16 +50,25 @@ class ViewController: UIViewController, SwitchingLightDelegate {
             DispatchQueue.main.async {
                 self.ImageSetup()
             }
+            
+            //to start and set the timer of the traffic lights
             self.trafficSwitch.StartAnimate(amberTimer:3.0, switchTimer:5.0)
         }
         else
         {
             self.buttonState = false
-            self.trafficSwitch.StopAnimate()
-            DispatchQueue.main.async {
-                self.startButton.setImage(UIImage(named: "start"), for: UIControlState())
+            DispatchQueue.global(qos: .default).async {
+                
+                self.trafficSwitch.StopAnimate()
+                DispatchQueue.main.async {
+                   
+                    self.startButton.setImage(UIImage(named: "start"), for: UIControlState())
+                }
+
             }
             
+            
+          
         }
        
     }

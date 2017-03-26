@@ -15,12 +15,14 @@ enum SwitchingMode{
     case notNormal
     
 }
-protocol SwitchingLightDelegate {
+protocol SwitchingLightDelegate: class {
     
     func AmberImage(marker:Bool)
     func UpdateImageColor(colorImage:String, marker:Bool)
     func UpdateImageColor2(colorImage:String)
 }
+
+
 
 class SwitchingLight: NSObject {
 
@@ -35,8 +37,10 @@ class SwitchingLight: NSObject {
     var imageName2 = "green"
     var imageMarker:Bool = true
     var switchDelay:Double = 0.0
+    
+    
    override init() {
-        
+
         northSouth = TrafficLight()
         eastWestLight = TrafficLight()
        
@@ -46,7 +50,7 @@ class SwitchingLight: NSObject {
     
     func StartAnimate(amberTimer:Double, switchTimer:Double ){
 
-         switchDelay = amberTimer + switchTimer + 2 + 2
+        switchDelay = amberTimer + switchTimer + 2 + 2
         self.northSouth?.amberTimer = amberTimer
         self.northSouth?.switchTimer = switchTimer
         self.eastWestLight?.amberTimer = amberTimer
@@ -54,77 +58,102 @@ class SwitchingLight: NSObject {
         
 
               self.NorthSouth()
-        
-        
     }
     
     
     func StopAnimate(){
         
-        self.theTimer.invalidate()
-        self.switchTimer.invalidate()
-        self.switchTimer2.invalidate()
-        self.theTimer2.invalidate()
+        if self.theTimer != nil{
+            self.theTimer.invalidate()
+        }
+        
+        if self.switchTimer != nil{
+            self.switchTimer.invalidate()
+        }
+        
+        if self.theTimer2 != nil {
+            self.theTimer2.invalidate()
+        }
+        
+        if self.switchTimer2 != nil{
+            self.switchTimer2.invalidate()
+        }
+        
+        
     }
     
-    
+    //North South Traffic
     func NorthSouth(){
         
         print("Hello")
         
         self.theTimer = Timer.scheduledTimer(timeInterval: self.northSouth!.amberTimer, target: self, selector:#selector(SwitchingLight.NorthSouth2) , userInfo: nil, repeats: false)
-        self.delegate.AmberImage(marker:true)
         self.imageMarker = true
-       
+        guard (self.delegate != nil) else {
+            print("delegate is nil")
+            
+            return
+        }
+        self.delegate.AmberImage(marker:true)
+        
+        
     }
 
     func NorthSouth2(){
         
-        print("Hello2")
+       
     
-        if self.imageMarker {
-            if imageName == "green"{
-                
+        self.UpdateImageNorthSouth(imageStr: self.imageName, isTrueMarker: self.imageMarker)
             
+     }
+
+    
+    func UpdateImageNorthSouth(imageStr:String, isTrueMarker:Bool){
+        
+       if isTrueMarker {
+            if imageStr == "green"{
+                
+                
                 //east west
                 self.perform(#selector(SwitchingLight.EastWest), with: nil, afterDelay: 2.0)
                 
-                imageName = "red"
+                self.imageName = "red"
                 self.delegate.UpdateImageColor(colorImage: imageName, marker: self.imageMarker)
                 self.switchTimer = Timer.scheduledTimer(timeInterval: switchDelay, target: self, selector:#selector(SwitchingLight.NorthSouth2) , userInfo: nil, repeats: false)
                 
                 
             }
             else{
-                imageName = "green"
+                self.imageName = "green"
                 
                 self.delegate.UpdateImageColor(colorImage: imageName, marker: self.imageMarker)
                 self.switchTimer = Timer.scheduledTimer(timeInterval: (self.northSouth?.switchTimer)!, target: self, selector:#selector(SwitchingLight.NorthSouth) , userInfo: nil, repeats: false)
             }
-
-        }
             
-     }
+        }
 
-    /*
-    func Sample3(){
-        
-        imageName = "green"
-        
-        self.switchTimer = Timer.scheduledTimer(timeInterval: (self.northSouth?.switchTimer)!, target: self, selector:#selector(SwitchingLight.NorthSouth) , userInfo: nil, repeats: false)
-        self.delegate.UpdateImageColor(colorImage: imageName, marker: self.imageMarker)
-    }*/
-    
-    
-    //east west
-    func EastWest(){
-        
-        self.imageName2 = "green"
-        self.delegate.UpdateImageColor(colorImage: self.imageName2, marker: false)
-        self.switchTimer2 = Timer.scheduledTimer(timeInterval: (self.eastWestLight?.switchTimer)!, target: self, selector:#selector(SwitchingLight.EastWestAmber) , userInfo: nil, repeats: false)
         
     }
     
+
+    
+    
+    
+    //East West Traffic 
+    func EastWest(){
+    
+            self.UpdateEastWest(imageStr:"green")
+
+    }
+    
+    
+    func UpdateEastWest(imageStr:String){
+        self.imageName2 = imageStr
+        self.delegate.UpdateImageColor(colorImage: self.imageName2, marker: false)
+        self.switchTimer2 = Timer.scheduledTimer(timeInterval: (self.eastWestLight?.switchTimer)!, target: self, selector:#selector(SwitchingLight.EastWestAmber) , userInfo: nil, repeats: false)
+        
+
+    }
     
     func EastWestAmber(){
         
@@ -135,12 +164,19 @@ class SwitchingLight: NSObject {
     
     func EastWestGreenRed(){
         
-        if imageName2 == "green"{
+        self.UpdateImageGreen(imageStr: self.imageName2, imageMarker:false)
+
+    }
+    
+    func UpdateImageGreen(imageStr:String, imageMarker:Bool){
+        
+        if imageStr == "green"{
             
             self.imageName2 = "red"
-            self.delegate.UpdateImageColor(colorImage: self.imageName2, marker: false)
-        
+            self.delegate.UpdateImageColor(colorImage: self.imageName2, marker: imageMarker)
+            
         }
+        
     }
     
 }
