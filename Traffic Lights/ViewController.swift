@@ -34,10 +34,10 @@ class ViewController: UIViewController, SwitchingLightDelegate {
 
     func setupTraffic(){
         self.title = "Traffic"
-        DispatchQueue.global(qos: .default).async {
+       // DispatchQueue.global(qos: .default).async {
             self.trafficSwitch = SwitchingLight()
             self.trafficSwitch.delegate = self
-        }
+        //}
     }
 
     
