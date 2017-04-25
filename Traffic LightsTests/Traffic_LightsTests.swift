@@ -38,13 +38,16 @@ class Traffic_LightsTests: XCTestCase {
     
     func testTrafficLight(){
         
-        
+        self.measure {
+            self.vc.setupTraffic()
+            self.vc.trafficSwitch.StartAnimate(amberTimer: 5, switchTimer: 10)
+        }
+
         //vc.viewDidLoad()
-        vc.setupTraffic()
-        vc.trafficSwitch.StartAnimate(amberTimer: 5, switchTimer: 10)
+       // vc.setupTraffic()
+       // vc.trafficSwitch.StartAnimate(amberTimer: 5, switchTimer: 10)
         XCTAssert(vc.trafficSwitch.switchDelay == 19, "Delay")
        
-        
         
     }
     
